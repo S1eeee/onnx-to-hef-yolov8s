@@ -1,13 +1,14 @@
 # Hailo ONNX to HEF Converter
 
 This docker image can be used to convert an ONNX exported **yolov8s model** to Hailo's **HEF format**.
-It utilizes the [Hailo Dataflow Compiler](https://hailo.ai/developer-zone/documentation/v3-28-0/?sp_referrer=install/install.html).
+This docker image might work for other yolo model versions with some modifications, but yolov8 is the priority
 
 ## Pre-requisites
 
 - Docker
-- ONNX exported model (only yolov8s tested so far)
-- Calibration images
+- ONNX exported model (only yolov8s)
+- Calibration images (from your training data)
+- Project intallation binaries from Hailo. For more details, see [additional-requirements](additional-requirements.txt)
 
 ## Usage
 
@@ -23,17 +24,11 @@ For reference see:
 - https://docs.ultralytics.com/modes/export/#why-choose-yolov8s-export-mode
 - https://github.com/hailo-ai/hailo_model_zoo/blob/master/training/yolov8/README.rst
 
-### 2. Clone the repository
+See this repo for an automated, complementary training container meant to work with this one: 
 
-> [!NOTE]  
-> The cloning takes longer than usual because of a large whl file.
 
-```bash
-git clone https://github.com/cyclux/HailoConverter.git
-cd HailoConverter
-```
 
-### 3. Build the docker image
+### 2. Build the docker image
 
 ```bash
 docker build -t hailo_converter .
@@ -41,38 +36,47 @@ docker build -t hailo_converter .
 
 ### 4. Prepare model and calibration images 
 
-Place the **ONNX model** and **calibration images** (`calibration_imgs` folder) in the root directory of the repository.
+Place the **ONNX model** and **calibration images folder** in the repository root.
 
 > [!NOTE] 
 > The calibration set should be real images that are a subset of the training dataset.
 > They should be diverse and representative of the dataset. Max 64 images are used.
 
-```bash
-cp /path/to/best.onnx best.onnx
-cp -r /path/to/calibration_imgs calibration_imgs
-```
+Obtaining these calibration images can be easily taken from your training images, but you might find it difficult to select up to 64 images representative of your dataset. If this is the case, you can try [This Script](/calibration_imgs/calibration-gathering.sh)
 
 ### 5. Run the docker image
 
 Ensure that the current directory is where the ONNX model and calibration images are placed.
 
 > [!IMPORTANT]
-> They need to be named `best.onnx` and `calibration_imgs`.
+> They need to be named **EXACTLY** `best.onnx` and `calibration_imgs`.
 
 ```bash
-docker run -v $(pwd):/workspace --gpus all --ipc=host hailo_converter:latest
+sudo docker run -v $(pwd):/workspace --ipc=host hailo_converter:latest
 ```
 
-This will run the following command inside the docker container:
+This command does not use your system's graphic card(s), if you have the requirements to use a GPU, you can alternatively run the following command:
 
 ```bash
-hailomz compile --ckpt best.onnx --hw-arch hailo8l --calib-path calibration_imgs/ --yaml yolov8s_custom.yaml --model-script yolov8s_custom.alls --classes 1
+sudo docker run -v $(pwd):/workspace --gpus all --ipc=host hailo_converter:latest
 ```
+If your user account is in the docker usegroup, you do not need sudo at the start of either command
+
+Running either command will run the following command inside the docker container:
+
+```bash
+hailomz compile --ckpt best.onnx --hw-arch hailo8l --calib-path calibration_imgs/ --yaml yolov8s_custom.yaml --model-script yolov8s_custom.alls --classes 5
+```
+
+Depending on your exact model goals, you might want to go into the [Dockerfile](Dockerfile) and change some fields, for example, if you have a different number of classes. Another thing you might want to change are your env variables (low priority it seems). 
+
+As for adjusting the ```hailomz compile``` command, for example, if you have different needs, such as a different number of classes, you can check out [entrypoint.sh](entrypoint.sh) 
 
 > [!NOTE]
 > The `Using deprecated NumPy API` warning at the beginning can be ignored it seems.
 
 > [!NOTE]  
-> The compilation can take a considerable amount of time.
+> The compilation can take a considerable amount of time, likely more if not using a GPU, though I am unsure as to exactly how much longer it can take
 
-Once successful, the HEF model will be saved in the same directory.
+Once successful, the HEF model will be saved in ```onnx-to-hef-yolov8/results``` The rest of the files in ```/results``` are safe to delete/move elsewhere. 
+It does not seem like this directory needs to be empty in order for this to work, but I'd recommend that you empty it out after every run.
