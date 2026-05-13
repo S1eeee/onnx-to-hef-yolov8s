@@ -24,7 +24,7 @@ For reference see:
 - https://docs.ultralytics.com/modes/export/#why-choose-yolov8s-export-mode
 - https://github.com/hailo-ai/hailo_model_zoo/blob/master/training/yolov8/README.rst
 
-See this repo for an automated, complementary training container meant to work with this one: 
+See this repo for an automated, complementary training container meant to work with this one: link-to-my-repo
 
 
 
@@ -44,7 +44,11 @@ Place the **ONNX model** and **calibration images folder** in the repository roo
 
 Obtaining these calibration images can be easily taken from your training images, but you might find it difficult to select up to 64 images representative of your dataset. If this is the case, you can try [This Script](/calibration_imgs/calibration-gathering.sh)
 
-### 5. Run the docker image
+### 5. Update parameters ***DO NOT SKIP***
+
+See [updating-parameters](updating-parameters.md) for more details
+
+### 6. Run the docker image
 
 Ensure that the current directory is where the ONNX model and calibration images are placed.
 
@@ -95,11 +99,22 @@ It does not seem like this directory needs to be empty in order for this to work
     See [this](additional-requirements.md) for details
     Then place them in the root of the cloned repo
 
-3. Place your ```best.onnx``` and your ```calibration_imgs``` in the root of the cloned repo
+
+3. Build the docker image
+
+```bash
+docker build -t hailo_converter .
+```
+
+4. Place your ```best.onnx``` and your ```calibration_imgs``` in the root of the cloned repo
 
     See above, [calibration-gathering](/calibration_imgs/readme.md) for details
 
-4. Open a terminal and ```cd``` to the root of the project. Once in, run one of the following:
+
+5. Update Parameters. See [updating-parameters](updating-parameters.md). ***DO NOT SKIP***
+
+
+6. Open a terminal and ```cd``` to the root of the project. Once in, run one of the following:
 
 ```bash
 sudo docker run -v $(pwd):/workspace --ipc=host hailo_converter:latest
@@ -111,8 +126,8 @@ This command does not use your system's graphic card(s), if you have the require
 sudo docker run -v $(pwd):/workspace --gpus all --ipc=host hailo_converter:latest
 ```
 
-5. Let docker work
+7. Let docker work
 
     Let it do its thing, it will output text to the terminal, and if all goes well, your onnx will turn into a hef
 
-6. Once done, visit [results](/results/) to recover your compiled hef
+8. Once done, visit [results](/results/) to recover your compiled hef

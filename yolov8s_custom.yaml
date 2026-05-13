@@ -19,7 +19,7 @@ parser:
     - /model.22/cv3.1/cv3.1.2/Conv
     - /model.22/cv2.2/cv2.2.2/Conv
     - /model.22/cv3.2/cv3.2.2/Conv
-info:
+info: #update the following if necessary, I just leave it as is, personally, due to it being metadata, it seems
   task: object detection
   input_shape: 640x640x3
   output_shape: 80x5x100
