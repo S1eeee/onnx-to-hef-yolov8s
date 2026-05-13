@@ -101,7 +101,7 @@ It does not seem like this directory needs to be empty in order for this to work
 
 4. Open a terminal and ```cd``` to the root of the project. Once in, run one of the following:
 
-    ```bash
+```bash
 sudo docker run -v $(pwd):/workspace --ipc=host hailo_converter:latest
 ```
 
