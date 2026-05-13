@@ -80,3 +80,39 @@ As for adjusting the ```hailomz compile``` command, for example, if you have dif
 
 Once successful, the HEF model will be saved in ```onnx-to-hef-yolov8/results``` The rest of the files in ```/results``` are safe to delete/move elsewhere. 
 It does not seem like this directory needs to be empty in order for this to work, but I'd recommend that you empty it out after every run.
+
+
+### In a Nutshell:
+
+1. Clone repo:
+
+    ```
+    git clone https://github.com/S1eeee/onnx-to-hef-yolov8"
+    ```
+
+2. Find Necessary Binaries
+
+    See [this](additional-requirements.md) for details
+    Then place them in the root of the cloned repo
+
+3. Place your ```best.onnx``` and your ```calibration_imgs``` in the root of the cloned repo
+
+    See above, [calibration-gathering](/calibration_imgs/readme.md) for details
+
+4. Open a terminal and ```cd``` to the root of the project. Once in, run one of the following:
+
+    ```bash
+sudo docker run -v $(pwd):/workspace --ipc=host hailo_converter:latest
+```
+
+This command does not use your system's graphic card(s), if you have the requirements to use a GPU, you can alternatively run the following command:
+
+```bash
+sudo docker run -v $(pwd):/workspace --gpus all --ipc=host hailo_converter:latest
+```
+
+5. Let docker work
+
+    Let it do its thing, it will output text to the terminal, and if all goes well, your onnx will turn into a hef
+
+6. Once done, visit [results](/results/) to recover your compiled hef
