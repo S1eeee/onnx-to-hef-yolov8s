@@ -24,7 +24,7 @@ For reference see:
 - https://docs.ultralytics.com/modes/export/#why-choose-yolov8s-export-mode
 - https://github.com/hailo-ai/hailo_model_zoo/blob/master/training/yolov8/README.rst
 
-See this repo for an automated, complementary training container meant to work with this one: link-to-my-repo
+See this repo for an automated, complementary training container meant to work with this one: [generating-onnx](https://github.com/S1eeee/generating-onnx)
 
 
 
